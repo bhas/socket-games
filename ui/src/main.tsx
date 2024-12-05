@@ -7,7 +7,7 @@ import About from "./pages/About.tsx";
 import Layout from "./pages/Layout.tsx";
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
+  // <StrictMode>
     <BrowserRouter>
       <Routes>
         <Route element={<Layout />}>
@@ -16,5 +16,5 @@ createRoot(document.getElementById("root")!).render(
         </Route>
       </Routes>
     </BrowserRouter>
-  </StrictMode>
+  // </StrictMode>
 );
