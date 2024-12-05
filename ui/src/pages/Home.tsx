@@ -1,36 +1,51 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router";
-import QuizService from "../server/quizService";
-
+import { useQuizService } from "../contexts/QuizServiceProvider";
 
 export default function Home() {
+  const [messageText, setMessageText] = useState<string>("");
+  const [messages, setMessages] = useState<string[]>([]);
+  const quizService = useQuizService()!;
 
-    const [messages, setMessages] = useState<string[]>([]);
+  useEffect(() => {
+    if (!quizService)
+        return; 
 
-    useEffect(() => {
-        const service = new QuizService();
-        service.start().then(() => {
-            service.onMessageReceived(onReceiveMessage);
-            service.sendMessage("user", "Hello, world 123!");
-        });
+    quizService.onMessageReceived(onReceiveMessage);
+    quizService.sendMessage("user", "Hello, world 123!");
 
-    }, [])
-
-    const onReceiveMessage = (message: string) => {
-        console.log("Yay I Received message:", message);
-        setMessages([...messages, message]);
+    return () => {
+        quizService.offMessageReceived(onReceiveMessage);
     }
+  }, [quizService]);
 
-    return (
-        <>
-        <h1>Home Page</h1>
-        <NavLink to="/about">About</NavLink>
+  const onReceiveMessage = (message: string) => {
+    setMessages(oldMessages => [...oldMessages, message]);
+  };
 
-        <h2>Messages</h2>
-        <ol className="list-decimal list-inside">
-            {messages.map((message, index) => <li key={index}>{message}</li>)}
-        </ol>
+  const handleSendMessage = () => {
+    quizService.sendMessage("user", messageText);
+  };
 
-        </>
-    )
+  return (
+    <>
+      <h1>Home Page</h1>
+      <NavLink to="/about">About</NavLink>
+
+      <input
+        type="text"
+        placeholder="Enter message"
+        value={messageText}
+        onChange={(e) => setMessageText(e.target.value)}
+      />
+      <button onClick={() => handleSendMessage()}>Send</button>
+
+      <h2>Messages</h2>
+      <ol className="list-decimal list-inside">
+        {messages.map((message, index) => (
+          <li key={index}>{message}</li>
+        ))}
+      </ol>
+    </>
+  );
 }

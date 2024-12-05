@@ -5,9 +5,11 @@ import { BrowserRouter, Route, Routes } from "react-router";
 import Home from "./pages/Home.tsx";
 import About from "./pages/About.tsx";
 import Layout from "./pages/Layout.tsx";
+import { QuizServiceProvider } from "./contexts/QuizServiceProvider.tsx";
 
 createRoot(document.getElementById("root")!).render(
   // <StrictMode>
+  <QuizServiceProvider>
     <BrowserRouter>
       <Routes>
         <Route element={<Layout />}>
@@ -16,5 +18,6 @@ createRoot(document.getElementById("root")!).render(
         </Route>
       </Routes>
     </BrowserRouter>
+  </QuizServiceProvider>
   // </StrictMode>
 );
