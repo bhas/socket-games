@@ -12,7 +12,7 @@ namespace SignalRChat
 
         public async Task Celebrate(string user)
         {
-            await Clients.All.SendAsync("ReceiveCelebration", user);
+            await Clients.All.SendAsync("ReceiveCelebration", user, 5);
         }
     }
 }

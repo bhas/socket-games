@@ -8,6 +8,17 @@ var builder = WebApplication.CreateBuilder(args);
 //builder.Services.AddSwaggerGen();
 builder.Services.AddSignalR();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowLocalhost", builder =>
+    {
+        builder.WithOrigins("http://localhost:5173")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -19,6 +30,7 @@ if (app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseCors("AllowLocalhost");
 app.UseHttpsRedirection();
 //app.UseStaticFiles();
 //app.UseRouting();
