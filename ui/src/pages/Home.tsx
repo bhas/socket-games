@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router";
 import { useQuizService } from "../contexts/QuizServiceProvider";
+import MessageList from "../components/MessageList";
 
 export default function Home() {
+  const [showListener, setShowListener] = useState<boolean>(true);
   const [messageText, setMessageText] = useState<string>("");
   const [messages, setMessages] = useState<string[]>([]);
   const quizService = useQuizService()!;
@@ -13,6 +15,10 @@ export default function Home() {
 
     quizService.onMessageReceived(onReceiveMessage);
     quizService.sendMessage("user", "Hello, world 123!");
+
+    setTimeout(() => {
+      setShowListener(false);
+    }, 3000);
 
     return () => {
         quizService.offMessageReceived(onReceiveMessage);
@@ -40,12 +46,13 @@ export default function Home() {
       />
       <button onClick={() => handleSendMessage()}>Send</button>
 
-      <h2>Messages</h2>
-      <ol className="list-decimal list-inside">
+      <MessageList header="Messages 1" />
+      {showListener && <MessageList header="Messages 2" />}
+      {/* <ol className="list-decimal list-inside">
         {messages.map((message, index) => (
           <li key={index}>{message}</li>
         ))}
-      </ol>
+      </ol> */}
     </>
   );
 }
