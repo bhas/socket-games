@@ -1,58 +1,43 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router";
 import { useQuizService } from "../contexts/QuizServiceProvider";
-import MessageList from "../components/MessageList";
+import Button from "../components/Button";
+import { QuizServiceAction } from "../server/quizService";
+import { Session } from "../server/models";
 
 export default function Home() {
-  const [showListener, setShowListener] = useState<boolean>(true);
-  const [messageText, setMessageText] = useState<string>("");
-  const [messages, setMessages] = useState<string[]>([]);
   const quizService = useQuizService()!;
 
   useEffect(() => {
-    if (!quizService)
-        return; 
+    if (!quizService) return;
 
-    quizService.onMessageReceived(onReceiveMessage);
-    quizService.sendMessage("user", "Hello, world 123!");
+    // quizService.onMessageReceived(onReceiveMessage);
+    // quizService.sendMessage("user", "Hello, world 123!");
 
-    setTimeout(() => {
-      setShowListener(false);
-    }, 3000);
 
     return () => {
-        quizService.offMessageReceived(onReceiveMessage);
-    }
+      // quizService.offMessageReceived(onReceiveMessage);
+    };
   }, [quizService]);
 
-  const onReceiveMessage = (message: string) => {
-    setMessages(oldMessages => [...oldMessages, message]);
+  const onCreateGame = async () => {
+    const session = await quizService.fetch<Session>(QuizServiceAction.CREATE_SESSION);
+    console.log(session);
   };
 
-  const handleSendMessage = () => {
-    quizService.sendMessage("user", messageText);
+  const onJoinGame = () => {
+    console.log("Join game");
   };
 
   return (
-    <>
+    <div className="flex flex-col">
       <h1>Home Page</h1>
       <NavLink to="/about">About</NavLink>
 
-      <input
-        type="text"
-        placeholder="Enter message"
-        value={messageText}
-        onChange={(e) => setMessageText(e.target.value)}
-      />
-      <button onClick={() => handleSendMessage()}>Send</button>
-
-      <MessageList header="Messages 1" />
-      {showListener && <MessageList header="Messages 2" />}
-      {/* <ol className="list-decimal list-inside">
-        {messages.map((message, index) => (
-          <li key={index}>{message}</li>
-        ))}
-      </ol> */}
-    </>
+      <div className="flex flex-row items-center justify-center gap-10">
+        <Button onClick={onCreateGame}>Create game</Button>
+        <Button onClick={onJoinGame}>Join game</Button>
+      </div>
+    </div>
   );
 }

@@ -1,8 +1,17 @@
 import {HubConnection, HubConnectionBuilder} from "@microsoft/signalr";
 
-enum EventType {
+export enum QuizServiceAction {
     SEND_MESSAGE = "SendMessage",
     SEND_CELEBRATION = "SendCelebration",
+    CREATE_SESSION = "CreateSession",
+    GET_SESSION = "GetSession",
+    JOIN_SESSION = "JoinSession",
+    LEAVE_SESSION = "LeaveSession",
+}
+
+export enum QuizServiceEvent {
+    PLAYER_JOINED_SESSION = "PlayerJoined",
+    PLAYER_LEFT_SESSION = "PlayerLeft",
     RECEIVE_MESSAGE = "ReceiveMessage",
     RECEIVE_CELEBRATION = "ReceiveCelebration"
 }
@@ -12,66 +21,69 @@ type Callback<T> = (data: T) => void;
 
 export default class QuizService {
     private connection: HubConnection;
-    private messageListeners: Callback<string>[] = [];
-    private celebrationListeners: Callback<number>[] = [];
+    private listeners: Map<string, Callback<any>[]> = new Map();
 
     constructor() {
+        this.initListenerMap();
         this.connection = new HubConnectionBuilder()
             .withUrl("https://localhost:32768/quiz")
             .build();
     }
 
     public async start() {
+        const listenToEvent = (event: QuizServiceEvent, dataFunc: (...args: any[]) => any) => {
+            this.connection.on(event, args => {
+                const data = dataFunc(args);
+                this.listeners.get(event)!.forEach((func) => func(data));
+                this.logMessageReceived(event, data);
+            });
+        }
+
         try {
             await this.connection.start();
             console.log("Connected to server");
-
-            this.connection.on(EventType.RECEIVE_MESSAGE, (user: string, data: string) => {
-                this.messageListeners.forEach((func) => func(data));
-                this.logMessageReceived(EventType.RECEIVE_MESSAGE, this.messageListeners.length, data);
-            });
-
-            this.connection.on(EventType.RECEIVE_CELEBRATION, (user: string, years: number) => {
-                this.celebrationListeners.forEach((func) => func(years));
-                this.logMessageReceived(EventType.RECEIVE_CELEBRATION, this.celebrationListeners.length, years);
-            });
+            listenToEvent(QuizServiceEvent.RECEIVE_MESSAGE, (user: string, data: string) => data);
+            listenToEvent(QuizServiceEvent.RECEIVE_CELEBRATION, (user: string, years: number) => years);
+            listenToEvent(QuizServiceEvent.PLAYER_JOINED_SESSION, (player: any) => player);
+            listenToEvent(QuizServiceEvent.PLAYER_LEFT_SESSION, (player: any) => player);
         }
         catch (e) {
             console.error(e, "Failed to connect to server");
         }
     }
 
-    public sendMessage(user: string, message: string) {
-        this.connection.invoke(EventType.SEND_MESSAGE, user, message);
-        this.logMessageSent(EventType.SEND_MESSAGE, message);
+    public async trigger(action: QuizServiceAction, args: any[] | undefined = undefined) {
+        await this.connection.invoke(action, args);
+        this.logMessageSent(action, args);
     }
 
-    public sendCelebration(user: string, years: number) {
-        this.connection.invoke(EventType.SEND_CELEBRATION, user, years);
-        this.logMessageSent(EventType.SEND_CELEBRATION, years);
+    public async fetch<TResult>(action: QuizServiceAction, args: any[] | undefined = undefined): Promise<TResult> {
+        const result = await this.connection.invoke<TResult>(action, args);
+        this.logMessageSent(action, args);
+        return result;
     }
 
-    public onMessageReceived(callback: Callback<string>) {
-        this.messageListeners.push(callback);
-    }
-    
-    public offMessageReceived(callback: Callback<string>) {
-        this.messageListeners = this.messageListeners.filter(func => func !== callback);
+    public on<T>(event: QuizServiceEvent, callback: Callback<T>): void {
+        this.listeners.get(event)!.push(callback);
     }
 
-    public onCelebrationReceived(callback: Callback<number>) {
-        this.celebrationListeners.push(callback);
+    public off<T>(event: QuizServiceEvent, callback: Callback<T>): void {
+        const newItems = this.listeners.get(event)!.filter(func => func !== callback);
+        this.listeners.set(event, newItems);
     }
 
-    public offCelebrationReceived(callback: Callback<number>) {
-        this.celebrationListeners = this.celebrationListeners.filter(func => func !== callback);
+    private initListenerMap() {
+        for (const key in QuizServiceEvent) {
+            this.listeners.set(key, []);
+        }
     }
 
-    private logMessageReceived(event: EventType, listeners: number, data: any) {
-        console.log(`QuizService: Received '${event}' with ${listeners} listeners`, data);
+    private logMessageReceived(event: QuizServiceEvent, data: any) {
+        const listenerCount = this.listeners.get(event)!.length;
+        console.log(`QuizService: Received '${event}' with ${listenerCount} listeners`, data);
     }
 
-    private logMessageSent(event: EventType, data: any | undefined) {
-        console.log(`QuizService: Sent '${event}'`, data);
+    private logMessageSent(action: QuizServiceAction, data: any | undefined) {
+        console.log(`QuizService: Sent '${action}'`, data);
     }
 }
