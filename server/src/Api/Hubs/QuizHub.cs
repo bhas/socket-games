@@ -81,7 +81,7 @@ namespace Api.Hubs
 
         public Session(string type)
         {
-            Id = "550-321"; // GenerateSessionId();
+            Id = GenerateSessionId();
             Type = type;
         }
 
@@ -101,8 +101,9 @@ namespace Api.Hubs
 
         private string GenerateSessionId()
         {
-            var random = new Random().Next(1, 1000000).ToString();
-            return random.Insert(3, "-");
+            var r1 = new Random().Next(1, 1000);
+            var r2 = new Random().Next(1, 1000);
+            return $"{r1:D3}-{r2:D3}";
         }
     }
 

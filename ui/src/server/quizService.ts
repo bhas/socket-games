@@ -21,7 +21,7 @@ type Callback<T> = (data: T) => void;
 
 export default class QuizService {
     private connection: HubConnection;
-    private listeners: Map<string, Callback<any>[]> = new Map();
+    private listeners: Map<QuizServiceEvent, Callback<any>[]> = new Map();
 
     constructor() {
         this.initListenerMap();
@@ -57,9 +57,9 @@ export default class QuizService {
         this.logMessageSent(action, args);
     }
 
-    public async fetch<TResult>(action: QuizServiceAction, args: any[] | undefined = undefined): Promise<TResult> {
-        const result = await this.connection.invoke<TResult>(action, args);
+    public async fetch<TResult>(action: QuizServiceAction, ...args: any[]): Promise<TResult> {
         this.logMessageSent(action, args);
+        const result = await this.connection.invoke<TResult>(action, ...args);
         return result;
     }
 
@@ -73,9 +73,9 @@ export default class QuizService {
     }
 
     private initListenerMap() {
-        for (const key in QuizServiceEvent) {
-            this.listeners.set(key, []);
-        }
+        Object.values(QuizServiceEvent).forEach(event => {
+            this.listeners.set(event, []);
+        });
     }
 
     private logMessageReceived(event: QuizServiceEvent, data: any) {
