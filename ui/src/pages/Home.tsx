@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import { useQuizService } from "../contexts/QuizServiceProvider";
 import Button from "../components/Button";
 import { QuizServiceAction } from "../server/quizService";
@@ -7,6 +7,7 @@ import { Session } from "../server/models";
 
 export default function Home() {
   const quizService = useQuizService()!;
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!quizService) return;
@@ -22,7 +23,7 @@ export default function Home() {
 
   const onCreateGame = async () => {
     const session = await quizService.fetch<Session>(QuizServiceAction.CREATE_SESSION);
-    console.log(session);
+    navigate(`/sessions/${session.id}/lobby`);
   };
 
   const onJoinGame = () => {
