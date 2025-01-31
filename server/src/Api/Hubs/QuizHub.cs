@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Api.Games;
+using Microsoft.AspNetCore.SignalR;
 namespace Api.Hubs
 {
-    public class QuizHub(ServiceState state) : Hub
+    public class QuizHub(ServiceState state, IRockPaperScissorsService rockPaperScissorsService) : Hub
     {
         public User SignIn(string username)
         {
@@ -38,6 +39,9 @@ namespace Api.Hubs
             if (existingPlayer != null)
                 throw new HubException($"You are already a part of the session {sessionId}");
 
+            if (session.IsLocked)
+                throw new HubException($"You cannot join the session at this moment {sessionId}");
+
             var user = state.users.Single(x => x.Id == userId);
             session.AddPlayer(user);
             await Clients.All.SendAsync("PlayerJoined", user);
@@ -51,55 +55,24 @@ namespace Api.Hubs
             session.RemovePlayer(player);
             await Clients.All.SendAsync("PlayerLeft", player);
         }
-    }
 
-    public class Session
-    {
-        public string Id { get; set; } = null!;
-        public string Type { get; set; } = null!;
-        public User? Owner { get; set; } = null!;
-        public List<User> Players { get; set; } = [];
-
-        public Session(string type)
+        public async Task StartGame(string sessionId, int userId, GameType gameType)
         {
-            Id = GenerateSessionId();
-            Type = type;
+            var session = state.sessions.Single(x => x.Id == sessionId);
+            if (session.Owner?.Id != userId)
+                throw new HubException($"Only the owner of the session can start the game");
+
+            await rockPaperScissorsService.StartGame(session);
         }
 
-        public void AddPlayer(User player)
+        public RockPaperScissorsGame GetGame(int gameId)
         {
-            Owner ??= player;
-            Players.Add(player);
+            return rockPaperScissorsService.GetGame(gameId);
         }
 
-        public void RemovePlayer(User player)
+        public async Task SelectMove(int gameId, int userId, RockPaperScissorsGame.Move move)
         {
-            if (Owner == player)
-                Owner = null;
-
-            Players.Remove(player);
-        }
-
-        private string GenerateSessionId()
-        {
-            var r1 = new Random().Next(1, 1000);
-            var r2 = new Random().Next(1, 1000);
-            return $"{r1:D3}-{r2:D3}";
-        }
-    }
-
-    public class User
-    {
-        public int Id { get; set; }
-        public string Username { get; set; } = null!;
-
-        public static User Create(string username)
-        {
-            return new User()
-            {
-                Id = new Random().Next(1, 1000),
-                Username = username
-            };
+            await rockPaperScissorsService.SelectMove(gameId, userId, move);
         }
     }
 }

@@ -1,4 +1,5 @@
 import {HubConnection, HubConnectionBuilder} from "@microsoft/signalr";
+import { RockPaperScissorsGame } from "./models";
 
 export enum QuizServiceAction {
     SIGN_IN = "SignIn",
@@ -8,13 +9,20 @@ export enum QuizServiceAction {
     GET_SESSION = "GetSession",
     JOIN_SESSION = "JoinSession",
     LEAVE_SESSION = "LeaveSession",
+
+    START_GAME = "StartGame",
+    STOP_GAME = "StopGame",
+    SELECT_MOVE = "SelectMove",
+    GET_GAME = "GetGame",
 }
 
 export enum QuizServiceEvent {
     PLAYER_JOINED_SESSION = "PlayerJoined",
     PLAYER_LEFT_SESSION = "PlayerLeft",
-    RECEIVE_MESSAGE = "ReceiveMessage",
-    RECEIVE_CELEBRATION = "ReceiveCelebration"
+    GAME_STARTED = "GameStarted",
+    GAME_STOPPED = "GameStopped",
+    GAME_COMPLETED = "GameCompleted",
+    ROUND_COMPLETED = "RoundCompleted",
 }
 
 type Callback<T> = (data: T) => void;
@@ -43,8 +51,10 @@ export default class QuizService {
         try {
             await this.connection.start();
             console.log("Connected to server");
-            listenToEvent(QuizServiceEvent.RECEIVE_MESSAGE, (user: string, data: string) => data);
-            listenToEvent(QuizServiceEvent.RECEIVE_CELEBRATION, (user: string, years: number) => years);
+            listenToEvent(QuizServiceEvent.GAME_STARTED, (game: RockPaperScissorsGame) => game);
+            listenToEvent(QuizServiceEvent.GAME_STOPPED, (gameId: number) => gameId);
+            listenToEvent(QuizServiceEvent.GAME_COMPLETED, (game: RockPaperScissorsGame) => game);
+            listenToEvent(QuizServiceEvent.ROUND_COMPLETED, (game: RockPaperScissorsGame) => game);
             listenToEvent(QuizServiceEvent.PLAYER_JOINED_SESSION, (player: any) => player);
             listenToEvent(QuizServiceEvent.PLAYER_LEFT_SESSION, (player: any) => player);
         }
@@ -53,8 +63,9 @@ export default class QuizService {
         }
     }
 
-    public async trigger(action: QuizServiceAction, args: any[] | undefined = undefined) {
-        await this.connection.invoke(action, args);
+    public async trigger(action: QuizServiceAction, ...args: any[]) {
+        console.log("Sending message", action, args);
+        await this.connection.invoke(action, ...args);
         this.logMessageSent(action, args);
     }
 

@@ -8,6 +8,7 @@ import Layout from "./pages/Layout.tsx";
 import { QuizServiceProvider } from "./contexts/QuizServiceProvider.tsx";
 import Lobby from "./pages/Lobby.tsx";
 import { PlayerProvider } from "./contexts/PlayerServiceProvider.tsx";
+import RockPaperScissors from "./pages/games/RockPaperScissors.tsx";
 
 createRoot(document.getElementById("root")!).render(
   // <StrictMode>
@@ -19,6 +20,7 @@ createRoot(document.getElementById("root")!).render(
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/sessions/:sessionId/lobby" element={<Lobby />} />
+          <Route path="/games/rock-paper-scissors/:gameId" element={<RockPaperScissors />} />
         </Route>
       </Routes>
     </BrowserRouter>

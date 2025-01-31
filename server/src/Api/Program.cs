@@ -1,4 +1,5 @@
 using Api;
+using Api.Games;
 using Api.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSignalR();
 
 builder.Services.AddSingleton(new ServiceState());
+builder.Services.AddTransient<IRockPaperScissorsService, RockPaperScissorsService>();
 
 builder.Services.AddCors(options =>
 {
