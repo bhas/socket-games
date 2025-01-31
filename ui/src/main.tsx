@@ -7,10 +7,12 @@ import About from "./pages/About.tsx";
 import Layout from "./pages/Layout.tsx";
 import { QuizServiceProvider } from "./contexts/QuizServiceProvider.tsx";
 import Lobby from "./pages/Lobby.tsx";
+import { PlayerProvider } from "./contexts/PlayerServiceProvider.tsx";
 
 createRoot(document.getElementById("root")!).render(
   // <StrictMode>
   <QuizServiceProvider>
+  <PlayerProvider>
     <BrowserRouter>
       <Routes>
         <Route element={<Layout />}>
@@ -20,6 +22,7 @@ createRoot(document.getElementById("root")!).render(
         </Route>
       </Routes>
     </BrowserRouter>
+  </PlayerProvider>
   </QuizServiceProvider>
   // </StrictMode>
 );

@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { useQuizService } from "../contexts/QuizServiceProvider";
 import { QuizServiceAction, QuizServiceEvent } from "../server/quizService";
-import { Player, Session } from "../server/models";
+import { User, Session } from "../server/models";
 
 export default function Lobby() {
-    const [players, setPlayers] = useState<Player[]>([]);
+    const [players, setPlayers] = useState<User[]>([]);
     const { sessionId } = useParams();
     const quizService = useQuizService();
 
@@ -22,14 +22,14 @@ export default function Lobby() {
             quizService.off(QuizServiceEvent.PLAYER_JOINED_SESSION, onPlayerJoined);
             quizService.off(QuizServiceEvent.PLAYER_LEFT_SESSION, onPlayerLeft);
         };
-    }, [quizService]);
+    }, [quizService, sessionId]);
 
-    const onPlayerJoined = (player: Player) => {
+    const onPlayerJoined = (player: User) => {
         setPlayers((prevPlayers) => [...prevPlayers, player]);
         console.log("Player joined session", player);
     };
 
-    const onPlayerLeft = (player: Player) => {
+    const onPlayerLeft = (player: User) => {
         setPlayers((prevPlayers) => prevPlayers.filter((x) => x.id !== player.id));
         console.log("Player left session", player);
     };

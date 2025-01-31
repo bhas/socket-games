@@ -1,6 +1,7 @@
 import {HubConnection, HubConnectionBuilder} from "@microsoft/signalr";
 
 export enum QuizServiceAction {
+    SIGN_IN = "SignIn",
     SEND_MESSAGE = "SendMessage",
     SEND_CELEBRATION = "SendCelebration",
     CREATE_SESSION = "CreateSession",
@@ -26,7 +27,7 @@ export default class QuizService {
     constructor() {
         this.initListenerMap();
         this.connection = new HubConnectionBuilder()
-            .withUrl("https://localhost:32768/quiz")
+            .withUrl("https://localhost:7223/quiz")
             .build();
     }
 

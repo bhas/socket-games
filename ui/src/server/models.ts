@@ -3,11 +3,11 @@
 export interface Session {
     id: string;
     type: string;
-    owner: Player;
-    players: Player[];
+    owner: User;
+    players: User[];
 }
 
-export interface Player {
+export interface User {
     id: number;
     username: string;
 }
