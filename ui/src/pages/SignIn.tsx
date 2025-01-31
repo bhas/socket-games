@@ -1,22 +1,25 @@
 import { FormEvent, useState } from "react";
-import { useQuizService } from "../contexts/QuizServiceProvider";
+import { useQuizService } from "../contexts/QuizServiceContext";
 import { QuizServiceAction } from "../server/quizService";
 import { User } from "../server/models";
-import { usePlayer } from "../contexts/PlayerServiceProvider";
+import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router";
 
 
 
 export default function SignIn() {
     const randomUsername = "Vue UI " + Math.floor(Math.random() * 100);
     const [username, setUsername] = useState<string>(randomUsername);
-    const { setMe } = usePlayer();
+    const { setMe } = useAuth();
     const quizService = useQuizService()!;
+    const navigate = useNavigate();
 
     const signIn = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const user = await quizService.fetch<User>(QuizServiceAction.SIGN_IN, username);
         console.log("Signed in as", user);
         setMe(user);
+        navigate("/");
     }
 
     return (

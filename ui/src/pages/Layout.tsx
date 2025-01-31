@@ -1,10 +1,10 @@
 import { Link, Outlet } from "react-router";
-import { usePlayer } from "../contexts/PlayerServiceProvider";
+import { useAuth } from "../contexts/AuthContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHome, faUser } from "@fortawesome/free-solid-svg-icons";
 
 export default function Layout() {
-  const { me } = usePlayer();
+  const { me } = useAuth();
 
   return (
     <>

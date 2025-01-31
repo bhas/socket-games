@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useQuizService } from "../contexts/QuizServiceProvider";
+import { useQuizService } from "../contexts/QuizServiceContext";
 
 interface Props {
   header: string;

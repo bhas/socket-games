@@ -1,16 +1,16 @@
 import { NavLink, useNavigate } from "react-router";
-import { useQuizService } from "../contexts/QuizServiceProvider";
+import { useQuizService } from "../contexts/QuizServiceContext";
 import Button from "../components/Button";
 import { QuizServiceAction } from "../server/quizService";
 import { Session } from "../server/models";
 import { useState } from "react";
-import { usePlayer } from "../contexts/PlayerServiceProvider";
-import SignIn from "../components/SignIn";
+import { useAuth } from "../contexts/AuthContext";
+import SignIn from "./SignIn";
 
 export default function Home() {
   const [sessionId, setSessionId] = useState("");
   const quizService = useQuizService()!;
-  const { me } = usePlayer();
+  const { me } = useAuth();
   const navigate = useNavigate();
 
   const onCreateGame = async () => {
@@ -27,19 +27,15 @@ export default function Home() {
 
   return (
     <div className="flex flex-col">
-        {me ? 
-        <>
-          <h1>Home Page</h1>
-          <NavLink to="/about">About</NavLink>
+    <h1>Home Page</h1>
+    <NavLink to="/about">About</NavLink>
 
-          <div className="flex flex-row items-center justify-center gap-10">
-            <Button onClick={onCreateGame}>Create game</Button>
-            <Button onClick={onJoinGame}>Join game</Button>
-            <input type="text" placeholder="Enter session ID" maxLength={7} value={sessionId} onChange={e => setSessionId(e.target.value)}/>
-          </div>
-          </>
-          : <SignIn/>
-        }
+    <div className="flex flex-row items-center justify-center gap-10">
+      <Button onClick={onCreateGame}>Create game</Button>
+      <Button onClick={onJoinGame}>Join game</Button>
+      <input type="text" placeholder="Enter session ID" maxLength={7} value={sessionId} onChange={e => setSessionId(e.target.value)}/>
+    </div>
+          
     </div>
   );
 }

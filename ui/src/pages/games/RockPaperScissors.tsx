@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
-import { useQuizService } from "../../contexts/QuizServiceProvider";
-import { Move, RockPaperScissorsGame, RoundResult } from "../../server/models";
+import { useQuizService } from "../../contexts/QuizServiceContext";
+import { Move, RockPaperScissorsGame } from "../../server/models";
 import { QuizServiceAction, QuizServiceEvent } from "../../server/quizService";
-import { usePlayer } from "../../contexts/PlayerServiceProvider";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function RockPaperScissors() {
   const quizService = useQuizService();
   const { gameId } = useParams();
   const gameIdInt = Number.parseInt(gameId!);
-  const { me } = usePlayer();
+  const { me } = useAuth();
 
   const [game, setGame] = useState<RockPaperScissorsGame | undefined>(undefined);
 

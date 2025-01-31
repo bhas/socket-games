@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { useQuizService } from "../contexts/QuizServiceProvider";
+import { useQuizService } from "../contexts/QuizServiceContext";
 import { QuizServiceAction, QuizServiceEvent } from "../server/quizService";
 import { User, Session, GameType, RockPaperScissorsGame } from "../server/models";
 import Button from "../components/Button";
-import { usePlayer } from "../contexts/PlayerServiceProvider";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Lobby() {
     const [players, setPlayers] = useState<User[]>([]);
     const { sessionId } = useParams();
-    const { me } = usePlayer();
+    const { me } = useAuth();
     const quizService = useQuizService();
     const navigate = useNavigate();
 
