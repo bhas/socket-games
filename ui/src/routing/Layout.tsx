@@ -20,7 +20,7 @@ export default function Layout() {
           </div>
         )}
       </header>
-      <main className="mx-auto max-w-4xl border-2 p-10">
+      <main>
         <Outlet />
       </main>
     </>

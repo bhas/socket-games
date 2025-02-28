@@ -5,6 +5,8 @@ import { QuizServiceAction, QuizServiceEvent } from "../server/quizService";
 import { User, Session, GameType, RockPaperScissorsGame } from "../server/models";
 import Button from "../components/Button";
 import { useAuth } from "../contexts/AuthContext";
+import MainContentContainer from "../components/MainContentContainer";
+import Title from "../components/Title";
 
 export default function Lobby() {
     const [players, setPlayers] = useState<User[]>([]);
@@ -48,8 +50,8 @@ export default function Lobby() {
     };
 
     return (
-        <div className="flex flex-col">
-            <h1>Lobby Page</h1>
+        <MainContentContainer>
+            <Title>Lobby Page</Title>
             {`session id is ${sessionId}`}
             <h2>Players</h2>
             <ol>
@@ -58,6 +60,6 @@ export default function Lobby() {
                 ))}
             </ol>
             <Button onClick={() => startGame()}>Start Game</Button>
-        </div>
+        </MainContentContainer>
     );
 }
