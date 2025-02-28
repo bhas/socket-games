@@ -5,11 +5,10 @@ import { Move, RockPaperScissorsGame, User } from "../../server/models";
 import { QuizServiceAction, QuizServiceEvent } from "../../server/quizService";
 import { useAuth } from "../../contexts/AuthContext";
 import MainContentContainer from "../../components/MainContentContainer";
-import {
-  RpsActionButton,
-} from "../../components/rockPaperScissors/RpsActionButton";
+import { RpsActionButton } from "../../components/rockPaperScissors/RpsActionButton";
 import Title from "../../components/Title";
 import { RpsAnimatedActionIcon } from "../../components/rockPaperScissors/RpsAnimatedActionIcon";
+import clsx from "clsx";
 
 export default function RockPaperScissors() {
   const quizService = useQuizService();
@@ -75,7 +74,6 @@ export default function RockPaperScissors() {
 
     return (
       <div className="flex flex-col items-center gap-12">
-        <h1>Leaderboard</h1>
         {scores}
       </div>
     );
@@ -94,11 +92,33 @@ export default function RockPaperScissors() {
           <Title>Rock Paper Scissors</Title>
 
           <div className="flex flex-row justify-between">
-            <MeSection onSelectMove={selectMove} username={me!.username} move={myMove} />
-            <OpponentSection username={opponent.username} />
+            <UserDetails alignLeft={true} title="You" username={me!.username} />
+            <div className="text-5xl top-3 font-bold text-black pt-3">VS.</div>
+            <UserDetails
+              alignLeft={false}
+              title="The Enemy"
+              username={opponent.username}
+            />
           </div>
 
-          <div className="grid grid-cols-2"></div>
+          <div className="self-center text-2xl font-bold text-black">
+            Round {game.leaderboard.rounds.length + 1}
+          </div>
+          <div className="flex flex-row justify-between">
+            <div className="flex flex-col">
+              <strong className="mb-4">Your Move</strong>
+              <ActionSelector move={myMove} onSelectMove={selectMove} />
+            </div>
+
+            <div className="flex flex-col items-end">
+              <strong className="mb-10">Their Move</strong>
+              <RpsAnimatedActionIcon />
+            </div>
+          </div>
+
+          <div className="self-center text-2xl mt-10 font-bold text-black">
+            Previous Rounds
+          </div>
 
           {renderLeaderboard()}
         </div>
@@ -107,35 +127,45 @@ export default function RockPaperScissors() {
   );
 }
 
-interface MeSectionProps {
-  username: string;
+interface ActionSelectorProps {
   move?: Move;
   onSelectMove: (move: Move) => void;
 }
 
-function MeSection({ username, move, onSelectMove }: MeSectionProps) {
+function ActionSelector({ move, onSelectMove }: ActionSelectorProps) {
   return (
-    <div className="flex flex-col items-start">
-      <div className="text-sm">(You)</div>
+    <div className="flex flex-row items-center justify-center gap-10">
+      <RpsActionButton
+        move={Move.ROCK}
+        onClick={() => onSelectMove(Move.ROCK)}
+        selected={move === Move.ROCK}
+      />
+      <RpsActionButton
+        move={Move.PAPER}
+        onClick={() => onSelectMove(Move.PAPER)}
+        selected={move === Move.PAPER}
+      />
+      <RpsActionButton
+        move={Move.SCISSORS}
+        onClick={() => onSelectMove(Move.SCISSORS)}
+        selected={move === Move.SCISSORS}
+      />
+    </div>
+  );
+}
+
+interface UserDetailsProps {
+  username: string;
+  title: string;
+  alignLeft: boolean;
+}
+
+function UserDetails({ username, title, alignLeft }: UserDetailsProps) {
+  const alignment = alignLeft ? "items-start" : "items-end";
+  return (
+    <div className={clsx("flex flex-col", alignment)}>
+      <div className="text-sm">({title})</div>
       <div className="text-2xl font-semibold mb-12">{username}</div>
-      <strong className="mb-4">Your Move</strong>
-      <div className="flex flex-row items-center justify-center gap-10">
-        <RpsActionButton
-          move={Move.ROCK}
-          onClick={() => onSelectMove(Move.ROCK)}
-          selected={move === Move.ROCK}
-        />
-        <RpsActionButton
-          move={Move.PAPER}
-          onClick={() => onSelectMove(Move.PAPER)}
-          selected={move === Move.PAPER}
-        />
-        <RpsActionButton
-          move={Move.SCISSORS}
-          onClick={() => onSelectMove(Move.SCISSORS)}
-          selected={move === Move.SCISSORS}
-        />
-      </div>
     </div>
   );
 }
@@ -150,7 +180,7 @@ function OpponentSection({ username }: OpponentSectionProps) {
     <div className="flex flex-col items-end">
       <div className="text-sm">(The Enemy)</div>
       <div className="text-2xl font-semibold mb-12">{username}</div>
-      <strong className="mb-10">Their Move</strong>
+      <strong className="mb-10 mt-32">Their Move</strong>
       <RpsAnimatedActionIcon />
     </div>
   );
