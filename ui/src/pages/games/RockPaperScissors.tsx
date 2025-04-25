@@ -169,19 +169,3 @@ function UserDetails({ username, title, alignLeft }: UserDetailsProps) {
     </div>
   );
 }
-
-interface OpponentSectionProps {
-  username: string;
-  move?: Move;
-}
-
-function OpponentSection({ username }: OpponentSectionProps) {
-  return (
-    <div className="flex flex-col items-end">
-      <div className="text-sm">(The Enemy)</div>
-      <div className="text-2xl font-semibold mb-12">{username}</div>
-      <strong className="mb-10 mt-32">Their Move</strong>
-      <RpsAnimatedActionIcon />
-    </div>
-  );
-}
