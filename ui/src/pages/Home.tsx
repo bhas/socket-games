@@ -5,7 +5,6 @@ import { QuizServiceAction } from "../server/quizService";
 import { Session } from "../server/models";
 import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import SignIn from "./SignIn";
 import MainContentContainer from "../components/MainContentContainer";
 import Title from "../components/Title";
 

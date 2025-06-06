@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { useQuizService } from "../../contexts/QuizServiceContext";
-import { Move, RockPaperScissorsGame, User } from "../../server/models";
+import { Move, RockPaperScissorsGame } from "../../server/models";
 import { QuizServiceAction, QuizServiceEvent } from "../../server/quizService";
 import { useAuth } from "../../contexts/AuthContext";
 import MainContentContainer from "../../components/MainContentContainer";
