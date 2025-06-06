@@ -51,6 +51,7 @@ export default class QuizService {
         }
 
         try {
+            // just a comment
             await this.connection.start();
             console.log("Connected to server");
             listenToEvent(QuizServiceEvent.GAME_STARTED, (game: RockPaperScissorsGame) => game);
