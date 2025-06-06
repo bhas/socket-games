@@ -32,10 +32,12 @@ export default class QuizService {
     private connection: HubConnection;
     private listeners: Map<QuizServiceEvent, Callback<any>[]> = new Map();
 
+
     constructor() {
+        const baseUrl = import.meta.env.VITE_API_URL;
         this.initListenerMap();
         this.connection = new HubConnectionBuilder()
-            .withUrl("https://localhost:7223/quiz")
+            .withUrl(baseUrl)
             .build();
     }
 
